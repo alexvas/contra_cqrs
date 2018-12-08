@@ -18,6 +18,9 @@ data class Movie(
         val title: String
 )
 
+
+const val MAX_SEATS_COUNT = 100
+
 /**
  * зал в кинотеатре
  */

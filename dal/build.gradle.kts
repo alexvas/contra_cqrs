@@ -8,7 +8,14 @@ plugins {
     id("org.liquibase.gradle")
 }
 
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+}
+
 dependencies {
+    implementation(project(":common"))
     implementation(Libs.kotlin_stdlib_jdk8)
 
     implementation(Libs.log4j_api)
