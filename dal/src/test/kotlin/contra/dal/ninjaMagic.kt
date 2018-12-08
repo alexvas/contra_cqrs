@@ -12,6 +12,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.postgresql.util.PGobject
 import java.sql.ParameterMetaData
 import java.sql.PreparedStatement
+import java.sql.Types.OTHER
 import javax.sql.DataSource
 
 object PgCustomBindConf : DefaultBinderConfiguration() {
@@ -36,12 +37,15 @@ object PgCustomBindConf : DefaultBinderConfiguration() {
                 return
             }
 
-            val obj = PGobject().apply {
-                this.type = chunks[1]  // type
-                this.value = chunks[0] // bare value
+            val type = chunks[1]
+            val v = chunks[0]
+            when {
+                "other" == type.toLowerCase() -> statement.setObject(paramIndex, v, OTHER)
+                else -> statement.setObject(paramIndex, PGobject().apply {
+                    this.type = type
+                    this.value = v
+                })
             }
-
-            statement.setObject(paramIndex, obj)
         }
     }
 }

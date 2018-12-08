@@ -35,6 +35,7 @@ interface MovieMapper {
             "       JOIN shows s ON m.id = s.movie_id\n" +
             "  AND s.start >= #{starting}\n" +
             "  AND #{ending} > s.start\n" +
+            "GROUP BY m.id, title\n" +
             "ORDER BY m.title")
     fun findInInterval(
             @Param("starting") startingIncluding: Instant,
