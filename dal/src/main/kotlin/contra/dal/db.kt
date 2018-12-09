@@ -54,7 +54,7 @@ fun findShowInInterval(movieId: Int, cinemaId: Int, startingIncluding: Instant, 
             startingOrNow(startingIncluding, endingExcluding),
             endingExcluding
     ).asSequence()
-            .groupBy(ShowWithHallNum::hallNum, ShowWithHallNum::show)
+            .groupBy(ShowWithHallData::hallNum, ShowWithHallData::show)
 
 }
 

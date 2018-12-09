@@ -148,5 +148,18 @@ class DbReadTest {
         }
     }
 
+    @Nested
+    inner class Сеансы {
+        @Test
+        fun `когда в «Гиганте» показывают «Акулу-каракулу»?`() {
+            val movies = findShowInInterval(
+                    1, 1, Instant.now(), afterHours(24)
+            );
+            log.info("а вот как показывают {}", movies)
+            assertThat(movies).isNotEmpty
+            assertThat(movies.size).isLessThan(11)
+            assertThat(movies.values.asSequence().map { it.size }.max()).isGreaterThan(0)
+        }
+    }
 
 }

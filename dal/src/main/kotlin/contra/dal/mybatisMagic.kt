@@ -20,7 +20,7 @@ import java.sql.ResultSet
 import java.util.*
 import kotlin.experimental.and
 
-private fun convert(input: ByteArray): Set<Int> = sequence {
+private fun convert(input: ByteArray): List<Int> = sequence {
     var num = 1
     do {
         val byteIdx = num / Byte.SIZE_BITS
@@ -28,22 +28,22 @@ private fun convert(input: ByteArray): Set<Int> = sequence {
         val examine = (1 shl bitIdx).toByte()
         if (input[byteIdx] and examine == 0.toByte()) yield(num)
     } while (++num <= MAX_SEATS_COUNT)
-}.toSortedSet()
+}.toList()
 
-@MappedTypes(Set::class)
-@MappedJdbcTypes(JdbcType.BINARY)
-class AvailableSeatsHandler : TypeHandler<Set<Int>> {
+@MappedTypes(List::class)
+@MappedJdbcTypes(JdbcType.BOOLEAN)
+class AvailableSeatsHandler : TypeHandler<List<Int>> {
 
-    override fun setParameter(ps: PreparedStatement, i: Int, parameter: Set<Int>, jdbcType: JdbcType) =
+    override fun setParameter(ps: PreparedStatement, i: Int, parameter: List<Int>, jdbcType: JdbcType) =
             throw UnsupportedOperationException("not used")
 
-    override fun getResult(rs: ResultSet, columnName: String): Set<Int> =
+    override fun getResult(rs: ResultSet, columnName: String): List<Int> =
             convert(rs.getBytes(columnName))
 
-    override fun getResult(rs: ResultSet, columnIndex: Int): Set<Int> =
+    override fun getResult(rs: ResultSet, columnIndex: Int): List<Int> =
             convert(rs.getBytes(columnIndex))
 
-    override fun getResult(cs: CallableStatement, columnIndex: Int): Set<Int> =
+    override fun getResult(cs: CallableStatement, columnIndex: Int): List<Int> =
             convert(cs.getBytes(columnIndex))
 }
 
@@ -83,7 +83,7 @@ fun configuration(): Configuration = Configuration(
                 )
         )
 ).apply {
-    typeHandlerRegistry.register(Set::class.java, AvailableSeatsHandler::class.java)
+    typeHandlerRegistry.register(List::class.java, AvailableSeatsHandler::class.java)
     addMapper(CinemaMapper::class.java)
     addMapper(MovieMapper::class.java)
     addMapper(ShowMapper::class.java)
