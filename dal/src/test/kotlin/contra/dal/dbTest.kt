@@ -4,6 +4,7 @@ import com.ninja_squad.dbsetup.Operations
 import com.ninja_squad.dbsetup_kotlin.insertInto
 import contra.common.Cinema
 import contra.common.Movie
+import contra.common.Show
 import org.apache.logging.log4j.LogManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
@@ -155,11 +156,14 @@ class DbReadTest {
             val movies = findShowInInterval(
                     1, 1, Instant.now(), afterHours(24)
             );
-            log.info("а вот как показывают {}", movies)
+            log.info("а вот как показывают: \n{}", dump(movies))
             assertThat(movies).isNotEmpty
             assertThat(movies.size).isLessThan(11)
             assertThat(movies.values.asSequence().map { it.size }.max()).isGreaterThan(0)
         }
     }
 
+    private fun dump(movies: Map<Int, List<Show>>): String = movies.asSequence().map { (key, list) ->
+        key.toString() + "\n" + list.joinToString("\n")
+    }.joinToString("\n")
 }

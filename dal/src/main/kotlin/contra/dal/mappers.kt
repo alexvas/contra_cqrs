@@ -7,6 +7,11 @@ import org.apache.ibatis.annotations.Arg
 import org.apache.ibatis.annotations.ConstructorArgs
 import org.apache.ibatis.annotations.Param
 import org.apache.ibatis.annotations.Select
+import org.apache.ibatis.type.BaseTypeHandler
+import org.apache.ibatis.type.JdbcType
+import java.sql.CallableStatement
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.time.Instant
 
 
@@ -57,7 +62,7 @@ data class ShowWithHallData(
             start: Instant,
             hallId: Int,
             movieId: Int,
-            availableSeats: List<Int>
+            availableSeats: Sequence<Int>
     ) : this(
             hallNum,
             Show(
@@ -65,12 +70,30 @@ data class ShowWithHallData(
                     hallId,
                     movieId,
                     start,
-                    availableSeats.asSequence()
+                    availableSeats
                             .filter { it <= hallSeats }
                             .toSortedSet()
             )
     )
 }
+
+private fun uoe(): Nothing = throw UnsupportedOperationException("not needed")
+
+class IntArrayTypeHandler : BaseTypeHandler<Sequence<Int>>() {
+
+    override fun setNonNullParameter(ps: PreparedStatement, i: Int, parameter: Sequence<Int>, jdbcType: JdbcType) = uoe()
+
+    override fun getNullableResult(rs: ResultSet, columnName: String) = asSequence(rs.getArray(columnName))
+
+    override fun getNullableResult(rs: ResultSet, columnIndex: Int) = asSequence(rs.getArray(columnIndex))
+
+    override fun getNullableResult(cs: CallableStatement, columnIndex: Int) = uoe()
+
+    @Suppress("UNCHECKED_CAST")
+    private fun asSequence(pgArray: java.sql.Array?) =
+            (pgArray?.array as? Array<Int>)?.asSequence() ?: emptySequence()
+}
+
 
 interface ShowMapper {
     /**
@@ -84,15 +107,15 @@ interface ShowMapper {
             Arg(column = "start", javaType = Instant::class),
             Arg(column = "hall_id", javaType = Int::class),
             Arg(column = "movie_id", javaType = Int::class),
-            Arg(column = "seats", javaType = List::class, typeHandler = AvailableSeatsHandler::class)
+            Arg(column = "seats", javaType = Sequence::class, typeHandler = IntArrayTypeHandler::class)
     )
-    @Select("SELECT h.num         AS num,\n" +
-            "       h.seats_count AS seats_count,\n" +
-            "       s.id          AS id,\n" +
-            "       s.start       AS start,\n" +
-            "       s.hall_id     AS hall_id,\n" +
-            "       s.movie_id    AS movie_id,\n" +
-            "       s.seats       AS seats\n" +
+    @Select("SELECT h.num              AS num,\n" +
+            "       h.seats_count      AS seats_count,\n" +
+            "       s.id               AS id,\n" +
+            "       s.start            AS start,\n" +
+            "       s.hall_id          AS hall_id,\n" +
+            "       s.movie_id         AS movie_id,\n" +
+            "       available(s.seats) AS seats\n" +
             "FROM shows s\n" +
             "       JOIN hall h on s.hall_id = h.id\n" +
             "WHERE s.start >= #{starting}\n" +
