@@ -11,7 +11,6 @@ import org.postgresql.util.PGobject
 import java.sql.ParameterMetaData
 import java.sql.PreparedStatement
 import java.sql.Types.OTHER
-import javax.sql.DataSource
 
 object PgCustomBindConf : DefaultBinderConfiguration() {
 
@@ -48,13 +47,13 @@ object PgCustomBindConf : DefaultBinderConfiguration() {
     }
 }
 
-class NinjaAdapter(private val ninjaDs: DataSource) {
+class NinjaAdapter {
     private val dbSetupTracker = DbSetupTracker()
 
     // вызываем в @BeforeEach beforeEach() теста
     fun prepare(vararg initDb: Operation): NinjaAdapter {
         require(initDb.isNotEmpty()) { "no init operation!" }
-        val dbSetup = DbSetup(DataSourceDestination(ninjaDs), adapt(initDb), PgCustomBindConf)
+        val dbSetup = DbSetup(DataSourceDestination(writeOnlyDataSource), adapt(initDb), PgCustomBindConf)
         dbSetupTracker.launchIfNecessary(dbSetup)
         return this
     }
@@ -63,7 +62,7 @@ class NinjaAdapter(private val ninjaDs: DataSource) {
             if (initDb.size == 1) initDb[0] else CompositeOperation.sequenceOf(initDb.toList())
 
     fun replenish(vararg additional: Operation): NinjaAdapter {
-        DbSetup(DataSourceDestination(ninjaDs), adapt(additional), PgCustomBindConf).launch()
+        DbSetup(DataSourceDestination(writeOnlyDataSource), adapt(additional), PgCustomBindConf).launch()
         return this
     }
 

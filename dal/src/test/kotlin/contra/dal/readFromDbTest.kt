@@ -100,7 +100,7 @@ class DbReadTest {
         configureSessionFactory()
 
         // все операции -- только чтение. Инициализировать БД надо один раз
-        NinjaAdapter(writeOnlyDataSource)
+        NinjaAdapter()
                 .prepare(deleteAll, cinema, movie, hall, shows)
     }
 
