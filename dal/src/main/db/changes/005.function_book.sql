@@ -1,5 +1,7 @@
 --liquibase formatted sql
 
+-- https://github.com/pgjdbc/pgjdbc/issues/908
+
 --changeset aavasiljev:5 endDelimiter:
 CREATE OR REPLACE FUNCTION book(show_id INT, nums INT[], OUT result BOOLEAN)
   RETURNS BOOLEAN
