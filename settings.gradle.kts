@@ -2,6 +2,7 @@ rootProject.name = "contra_cqrs"
 
 include(
         "common",
-        "dal"
+        "dal",
+        "rest"
 )
 

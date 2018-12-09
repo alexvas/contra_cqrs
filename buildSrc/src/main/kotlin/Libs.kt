@@ -28,6 +28,14 @@ object Libs {
      * [HikariCP website](https://github.com/brettwooldridge/HikariCP) */
     const val hikaricp: String = "com.zaxxer:HikariCP:" + Versions.hikaricp
 
+    const val ktor_client_apache: String = "io.ktor:ktor-client-apache:" + Versions.io_ktor
+
+    const val ktor_client_jackson: String = "io.ktor:ktor-client-jackson:" + Versions.io_ktor
+
+    const val ktor_server_core: String = "io.ktor:ktor-server-core:" + Versions.io_ktor
+
+    const val ktor_server_netty: String = "io.ktor:ktor-server-netty:" + Versions.io_ktor
+
     /**
      * [mockk website](http://mockk.io) */
     const val mockk: String = "io.mockk:mockk:" + Versions.mockk
@@ -84,6 +92,11 @@ object Libs {
      * [kotlin-stdlib-jdk8 website](https://kotlinlang.org/) */
     const val kotlin_stdlib_jdk8: String =
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" + Versions.kotlin_stdlib_jdk8
+
+    /**
+     * [kotlinx-coroutines-core website](https://github.com/Kotlin/kotlinx.coroutines) */
+    const val kotlinx_coroutines_core: String =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-core:" + Versions.kotlinx_coroutines_core
 
     /**
      * [junit-jupiter-api website](http://junit.org/junit5/) */

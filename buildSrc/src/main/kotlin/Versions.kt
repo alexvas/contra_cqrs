@@ -15,6 +15,9 @@ object Versions {
 
     const val hikaricp: String = "3.2.0" 
 
+    const val io_ktor: String =
+            "1.0.0" // No update information. Is this dependency available on jcenter or mavenCentral?
+
     const val mockk: String = "1.8.13.kotlin13" //available: "1.8.13" 
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6" 
@@ -34,6 +37,8 @@ object Versions {
             "1.3.11" // exceed the version found: 1.3.10
 
     const val kotlin_stdlib_jdk8: String = "1.3.10" 
+
+    const val kotlinx_coroutines_core: String = "1.0.1" 
 
     const val org_junit_jupiter: String = "5.3.2" 
 
@@ -57,7 +62,7 @@ object Versions {
 
         const val currentVersion: String = "5.0"
 
-        const val nightlyVersion: String = "5.2-20181208000047+0000"
+        const val nightlyVersion: String = "5.2-20181209090804+0000"
 
         const val releaseCandidate: String = ""
     }
