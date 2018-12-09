@@ -22,6 +22,8 @@ object Versions {
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6" 
 
+    const val owner_java8: String = "1.0.10" 
+
     const val org_apache_logging_log4j: String = "2.11.1" 
 
     const val assertj_core: String = "3.11.1" 

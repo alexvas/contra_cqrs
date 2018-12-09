@@ -32,6 +32,8 @@ object Libs {
 
     const val ktor_client_jackson: String = "io.ktor:ktor-client-jackson:" + Versions.io_ktor
 
+    const val ktor_jackson: String = "io.ktor:ktor-jackson:" + Versions.io_ktor
+
     const val ktor_server_core: String = "io.ktor:ktor-server-core:" + Versions.io_ktor
 
     const val ktor_server_netty: String = "io.ktor:ktor-server-netty:" + Versions.io_ktor
@@ -42,6 +44,10 @@ object Libs {
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
             "jmfayard.github.io.gradle-kotlin-dsl-libs:jmfayard.github.io.gradle-kotlin-dsl-libs.gradle.plugin:" + Versions.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
+
+    /**
+     * [owner-java8 website](http://owner.aeonbits.org) */
+    const val owner_java8: String = "org.aeonbits.owner:owner-java8:" + Versions.owner_java8
 
     /**
      * [log4j-api website](https://logging.apache.org/log4j/2.x/) */
