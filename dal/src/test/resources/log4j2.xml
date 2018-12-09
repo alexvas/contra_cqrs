@@ -18,6 +18,7 @@
     </Root>
 
     <Logger name="contra.dal" level="debug" />
+    <Logger name="com.zaxxer.hikari" level="debug" />
 
   </Loggers>
 </Configuration>

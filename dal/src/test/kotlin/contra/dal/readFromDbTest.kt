@@ -7,6 +7,7 @@ import contra.common.Movie
 import contra.common.Show
 import org.apache.logging.log4j.LogManager
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -14,14 +15,14 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
-private val deleteAll = Operations.deleteAllFrom(
+internal val deleteAll = Operations.deleteAllFrom(
         "shows",
         "movie",
         "hall",
         "cinema"
 )!!
 
-private val cinema = insertInto("cinema") {
+internal val cinema = insertInto("cinema") {
     var id = 0
     columns("id", "name")
     values(++id, "Гигант")
@@ -29,7 +30,7 @@ private val cinema = insertInto("cinema") {
     values(++id, "Аврора")
 }
 
-private val movie = insertInto("movie") {
+internal val movie = insertInto("movie") {
     var id = 0
     columns("id", "title")
     values(++id, "Акула-каракула страйкс бэк")
@@ -38,7 +39,7 @@ private val movie = insertInto("movie") {
     values(++id, "Белоснежко и семь женишков")
 }
 
-private val hall = insertInto("hall") {
+internal val hall = insertInto("hall") {
     var id = 0
     columns("id", "num", "cinema_id")
 
@@ -60,7 +61,7 @@ private val after8h = afterHours(8)
 
 private fun afterHours(num: Int) = Instant.now().plus(num.toLong(), ChronoUnit.HOURS)!!
 
-private val starts = listOf(after1h, after2h, after3h, after4h, after5h, after6h, after7h, after8h)
+internal val starts = listOf(after1h, after2h, after3h, after4h, after5h, after6h, after7h, after8h)
 
 
 private val shows = insertInto("shows") {
@@ -78,6 +79,10 @@ private fun generateRandomBookedSeats(): String {
     repeat(Random.nextInt(1, 100)) {
         bookedSeats += allSeats.removeAt(Random.nextInt(0, allSeats.lastIndex))
     }
+    return buildSeatsBitString(bookedSeats)
+}
+
+fun buildSeatsBitString(bookedSeats: Collection<Int>): String {
     val buf = StringBuffer()
     repeat(100) {
         buf.append(if (bookedSeats.contains(it + 1)) 1 else 0)
@@ -91,9 +96,17 @@ class DbReadTest {
 
     @BeforeAll
     fun setUp() {
+        configurePools("jdbc:postgresql://localhost:5432/contra_cqrs", "contra_cqrs")
+        configureSessionFactory()
+
         // все операции -- только чтение. Инициализировать БД надо один раз
-        NinjaAdapter()
+        NinjaAdapter(writeOnlyDataSource)
                 .prepare(deleteAll, cinema, movie, hall, shows)
+    }
+
+    @AfterAll
+    fun tearDown() {
+        closePools()
     }
 
     @Nested
@@ -151,15 +164,23 @@ class DbReadTest {
 
     @Nested
     inner class Сеансы {
+
+        @Test
+        fun `произвольный сеанс`() {
+            val show = findShow(7)
+            assertThat(show.availableSeats).isNotEmpty
+            assertThat(show.availableSeats.size).isLessThan(100)
+        }
+
         @Test
         fun `когда в «Гиганте» показывают «Акулу-каракулу»?`() {
-            val movies = findShowInInterval(
+            val shows = findShowInInterval(
                     1, 1, Instant.now(), afterHours(24)
             );
-            log.info("а вот как показывают: \n{}", dump(movies))
-            assertThat(movies).isNotEmpty
-            assertThat(movies.size).isLessThan(11)
-            assertThat(movies.values.asSequence().map { it.size }.max()).isGreaterThan(0)
+            log.info("а вот как показывают: \n{}", dump(shows))
+            assertThat(shows).isNotEmpty
+            assertThat(shows.size).isLessThan(11)
+            assertThat(shows.values.asSequence().map { it.size }.max()).isGreaterThan(0)
         }
     }
 

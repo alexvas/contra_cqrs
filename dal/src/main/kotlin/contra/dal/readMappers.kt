@@ -3,16 +3,19 @@ package contra.dal
 import contra.common.Cinema
 import contra.common.Movie
 import contra.common.Show
-import org.apache.ibatis.annotations.Arg
-import org.apache.ibatis.annotations.ConstructorArgs
-import org.apache.ibatis.annotations.Param
-import org.apache.ibatis.annotations.Select
+import org.apache.ibatis.annotations.*
+import org.apache.ibatis.mapping.Environment
+import org.apache.ibatis.session.Configuration
+import org.apache.ibatis.session.SqlSessionFactory
+import org.apache.ibatis.session.SqlSessionFactoryBuilder
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory
 import org.apache.ibatis.type.BaseTypeHandler
 import org.apache.ibatis.type.JdbcType
 import java.sql.CallableStatement
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.Instant
+import java.util.*
 
 
 interface CinemaMapper {
@@ -94,12 +97,19 @@ class IntArrayTypeHandler : BaseTypeHandler<Sequence<Int>>() {
             (pgArray?.array as? Array<Int>)?.asSequence() ?: emptySequence()
 }
 
+private const val selectShowWithHallData = "SELECT h.num              AS num,\n" +
+        "       h.seats_count      AS seats_count,\n" +
+        "       s.id               AS id,\n" +
+        "       s.start            AS start,\n" +
+        "       s.hall_id          AS hall_id,\n" +
+        "       s.movie_id         AS movie_id,\n" +
+        "       available(s.seats) AS seats\n" +
+        "FROM shows s\n" +
+        "       JOIN hall h on s.hall_id = h.id\n"
 
 interface ShowMapper {
-    /**
-     * Отдаём сеансы вместе с кинозалом для заданных кинотеатра, фильма и интервала времени.
-     * Данные отсортированы по номеру кинозала, а потом -- по времени начала фильма.
-     */
+
+    @Results(id = "ShowWithHallData")
     @ConstructorArgs(
             Arg(column = "num", javaType = Int::class),
             Arg(column = "seats_count", javaType = Int::class),
@@ -109,15 +119,15 @@ interface ShowMapper {
             Arg(column = "movie_id", javaType = Int::class),
             Arg(column = "seats", javaType = Sequence::class, typeHandler = IntArrayTypeHandler::class)
     )
-    @Select("SELECT h.num              AS num,\n" +
-            "       h.seats_count      AS seats_count,\n" +
-            "       s.id               AS id,\n" +
-            "       s.start            AS start,\n" +
-            "       s.hall_id          AS hall_id,\n" +
-            "       s.movie_id         AS movie_id,\n" +
-            "       available(s.seats) AS seats\n" +
-            "FROM shows s\n" +
-            "       JOIN hall h on s.hall_id = h.id\n" +
+    @Select(selectShowWithHallData + "WHERE s.id = #{id}")
+    fun find(id: Int): ShowWithHallData
+
+    /**
+     * Отдаём сеансы вместе с кинозалом для заданных кинотеатра, фильма и интервала времени.
+     * Данные отсортированы по номеру кинозала, а потом -- по времени начала фильма.
+     */
+    @ResultMap("ShowWithHallData")
+    @Select(selectShowWithHallData +
             "WHERE s.start >= #{starting}\n" +
             "  AND #{ending} > s.start\n" +
             "  AND s.movie_id = #{movie_id}\n" +
@@ -130,3 +140,28 @@ interface ShowMapper {
             @Param("ending") endingExcluding: Instant
     ): List<ShowWithHallData>
 }
+
+private fun configuration(): Configuration = Configuration(
+        Environment(
+                "main",
+                ManagedTransactionFactory().apply {
+                    setProperties(Properties().apply { this["closeConnection"] = false })
+                },
+                readOnlyDataSource
+        )
+).apply {
+    addMapper(CinemaMapper::class.java)
+    addMapper(MovieMapper::class.java)
+    addMapper(ShowMapper::class.java)
+}
+
+fun configureSessionFactory() {
+    sessionFactory = SqlSessionFactoryBuilder().build(configuration())!!
+}
+
+lateinit var sessionFactory: SqlSessionFactory
+
+inline fun <reified M, T> mapper(request: (mapper: M) -> T): T = sessionFactory.openSession()!!
+        .use {
+            it.getMapper(M::class.java).run(request)
+        }

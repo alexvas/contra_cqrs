@@ -5,22 +5,22 @@ import contra.common.Movie
 import contra.common.Show
 import java.time.Instant
 
-fun allCinemas() = mapper<CinemaMapper>().all()
+fun allCinemas() = mapper<CinemaMapper, List<Cinema>> { it.all() }
 
 fun findCinema(id: Int): Cinema {
     require(id > 0) {
         "non-positive id $id"
     }
-    return mapper<CinemaMapper>().find(id)
+    return mapper<CinemaMapper, Cinema> { it.find(id) }
 }
 
-fun allMovies() = mapper<MovieMapper>().all()
+fun allMovies() = mapper<MovieMapper, List<Movie>> { it.all() }
 
 fun findMovie(id: Int): Movie {
     require(id > 0) {
         "non-positive id $id"
     }
-    return mapper<MovieMapper>().find(id)
+    return mapper<MovieMapper, Movie> { it.find(id) }
 }
 
 fun findMovieInInterval(startingIncluding: Instant, endingExcluding: Instant): List<Movie> {
@@ -28,10 +28,19 @@ fun findMovieInInterval(startingIncluding: Instant, endingExcluding: Instant): L
         "start $startingIncluding is not before end $endingExcluding"
     }
 
-    return mapper<MovieMapper>().findInInterval(
-            startingOrNow(startingIncluding, endingExcluding),
-            endingExcluding
-    )
+    return mapper<MovieMapper, List<Movie>> {
+        it.findInInterval(
+                startingOrNow(startingIncluding, endingExcluding),
+                endingExcluding
+        )
+    }
+}
+
+fun findShow(id: Int): Show {
+    require(id > 0) {
+        "non-positive id $id"
+    }
+    return mapper<ShowMapper, Show> { it.find(id).show }
 }
 
 fun findShowInInterval(movieId: Int, cinemaId: Int, startingIncluding: Instant, endingExcluding: Instant): Map<Int, List<Show>> {
@@ -48,13 +57,15 @@ fun findShowInInterval(movieId: Int, cinemaId: Int, startingIncluding: Instant, 
         "start $startingIncluding is not before end $endingExcluding"
     }
 
-    return mapper<ShowMapper>().findInInterval(
-            movieId,
-            cinemaId,
-            startingOrNow(startingIncluding, endingExcluding),
-            endingExcluding
-    ).asSequence()
-            .groupBy(ShowWithHallData::hallNum, ShowWithHallData::show)
+    return mapper<ShowMapper, Map<Int, List<Show>>> {
+        it.findInInterval(
+                movieId,
+                cinemaId,
+                startingOrNow(startingIncluding, endingExcluding),
+                endingExcluding
+        ).asSequence()
+                .groupBy(ShowWithHallData::hallNum, ShowWithHallData::show)
+    }
 
 }
 

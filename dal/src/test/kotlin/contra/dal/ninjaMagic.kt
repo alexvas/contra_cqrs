@@ -7,8 +7,6 @@ import com.ninja_squad.dbsetup.bind.DefaultBinderConfiguration
 import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.CompositeOperation
 import com.ninja_squad.dbsetup.operation.Operation
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import org.postgresql.util.PGobject
 import java.sql.ParameterMetaData
 import java.sql.PreparedStatement
@@ -50,25 +48,8 @@ object PgCustomBindConf : DefaultBinderConfiguration() {
     }
 }
 
-class NinjaAdapter {
+class NinjaAdapter(private val ninjaDs: DataSource) {
     private val dbSetupTracker = DbSetupTracker()
-    private val ninjaDs: DataSource
-
-    init {
-        ReadOnlyHikariConfig.config = HikariConfig().apply {
-            jdbcUrl = "jdbc:postgresql://localhost:5432/contra_cqrs"
-            username = "contra_cqrs"
-            isReadOnly = true
-            isAutoCommit = false
-        }
-        ninjaDs = HikariDataSource(
-                HikariConfig().apply {
-                    ReadOnlyHikariConfig.config.copyStateTo(this)
-                    isReadOnly = false
-                }
-        )
-
-    }
 
     // вызываем в @BeforeEach beforeEach() теста
     fun prepare(vararg initDb: Operation): NinjaAdapter {
