@@ -26,7 +26,6 @@ class DbWriteTest {
     @BeforeAll
     fun setUp() {
         configurePools("jdbc:postgresql://localhost:5432/contra_cqrs", "contra_cqrs")
-        configureSessionFactory()
         ninja = NinjaAdapter()
                 .prepare(deleteAll, cinema, movie, hall)
     }

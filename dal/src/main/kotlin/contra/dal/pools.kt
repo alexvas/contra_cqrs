@@ -31,6 +31,7 @@ fun configurePools(jdbcUrl: String, user: String, password: String? = null) {
                 }
             }
     )
+    configureSessionFactory()
 }
 
 fun closePools() {
@@ -38,5 +39,5 @@ fun closePools() {
     writeOnlyDataSource.close()
 }
 
-lateinit var readOnlyDataSource: HikariDataSource
-lateinit var writeOnlyDataSource: HikariDataSource
+internal lateinit var readOnlyDataSource: HikariDataSource
+internal lateinit var writeOnlyDataSource: HikariDataSource

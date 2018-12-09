@@ -97,7 +97,6 @@ class DbReadTest {
     @BeforeAll
     fun setUp() {
         configurePools("jdbc:postgresql://localhost:5432/contra_cqrs", "contra_cqrs")
-        configureSessionFactory()
 
         // все операции -- только чтение. Инициализировать БД надо один раз
         NinjaAdapter()
