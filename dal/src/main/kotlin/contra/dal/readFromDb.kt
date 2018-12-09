@@ -7,20 +7,20 @@ import java.time.Instant
 
 fun allCinemas() = mapper<CinemaMapper, List<Cinema>> { it.all() }
 
-fun findCinema(id: Int): Cinema {
+fun findCinema(id: Int): Cinema? {
     require(id > 0) {
         "non-positive id $id"
     }
-    return mapper<CinemaMapper, Cinema> { it.find(id) }
+    return mapper<CinemaMapper, Cinema?> { it.find(id) }
 }
 
 fun allMovies() = mapper<MovieMapper, List<Movie>> { it.all() }
 
-fun findMovie(id: Int): Movie {
+fun findMovie(id: Int): Movie? {
     require(id > 0) {
         "non-positive id $id"
     }
-    return mapper<MovieMapper, Movie> { it.find(id) }
+    return mapper<MovieMapper, Movie?> { it.find(id) }
 }
 
 fun findMovieInInterval(startingIncluding: Instant, endingExcluding: Instant): List<Movie> {
@@ -36,11 +36,11 @@ fun findMovieInInterval(startingIncluding: Instant, endingExcluding: Instant): L
     }
 }
 
-fun findShow(id: Int): Show {
+fun findShow(id: Int): Show? {
     require(id > 0) {
         "non-positive id $id"
     }
-    return mapper<ShowMapper, Show> { it.find(id).show }
+    return mapper<ShowMapper, Show?> { it.find(id)?.show }
 }
 
 fun findShowInInterval(movieId: Int, cinemaId: Int, startingIncluding: Instant, endingExcluding: Instant): Map<Int, List<Show>> {

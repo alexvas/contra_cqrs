@@ -24,7 +24,7 @@ interface CinemaMapper {
     fun all(): List<Cinema>
 
     @Select("SELECT * FROM cinema WHERE id = #{id}")
-    fun find(@Param("id") id: Int): Cinema
+    fun find(@Param("id") id: Int): Cinema?
 
 }
 
@@ -34,7 +34,7 @@ interface MovieMapper {
     fun all(): List<Movie>
 
     @Select("SELECT * FROM movie WHERE id = #{id}")
-    fun find(@Param("id") id: Int): Movie
+    fun find(@Param("id") id: Int): Movie?
 
     /**
      * отдаём фильмы, которые показывают в заданный интервал времени, списком,
@@ -120,7 +120,7 @@ interface ShowMapper {
             Arg(column = "seats", javaType = Sequence::class, typeHandler = IntArrayTypeHandler::class)
     )
     @Select(selectShowWithHallData + "WHERE s.id = #{id}")
-    fun find(id: Int): ShowWithHallData
+    fun find(id: Int): ShowWithHallData?
 
     /**
      * Отдаём сеансы вместе с кинозалом для заданных кинотеатра, фильма и интервала времени.
