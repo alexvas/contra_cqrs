@@ -11,12 +11,10 @@ BEGIN
   result = '{}';
   FOR idx IN 0..99
     LOOP
-      CONTINUE WHEN ((inp | (B'1' << idx)) = B'1');
-      result = array_append(result, ARRAY [idx]);
+      CONTINUE WHEN get_bit(inp, idx) = 1;
+      result = array_append(result, idx + 1);
     END LOOP;
   RETURN result;
 END;
 $body$
   LANGUAGE PlPgSQL;
-
---rollback drop function book(show_id INT, nums INT[]);

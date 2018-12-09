@@ -2,20 +2,23 @@
 
 --changeset aavasiljev:5 endDelimiter:
 CREATE OR REPLACE FUNCTION book(show_id INT, nums INT[])
-  RETURNS boolean
+  RETURNS BOOLEAN
 AS
 $body$
 DECLARE
-  curr     INT;
-  combined INT;
+  curr bit(100);
+  num  INT;
 BEGIN
-  FOREACH curr IN ARRAY nums
+  SELECT seats INTO curr FROM shows WHERE id = show_id;
+  FOREACH num IN ARRAY nums
     LOOP
-      combined = combined | (B'1' << (curr - 1));
+      IF (get_bit(curr, num - 1) = 1) THEN
+        RETURN false;
+      END IF;
+      curr = set_bit(curr, num - 1, 1);
     END LOOP;
-  UPDATE shows SET seats = seats | combined WHERE id = show_id AND (seats & combined)::INT = 0;
+  UPDATE shows SET seats = curr WHERE id = show_id;
+  RETURN true;
 END;
 $body$
   LANGUAGE PlPgSQL;
-
---rollback drop function book(show_id INT, nums INT[]);

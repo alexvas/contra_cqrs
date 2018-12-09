@@ -15,5 +15,3 @@ CREATE INDEX show_hall_key
   ON shows (hall_id);
 CREATE INDEX show_movie_key
   ON shows (movie_id);
-
---rollback drop table shows;

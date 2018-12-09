@@ -11,4 +11,3 @@ CREATE TABLE hall
 );
 CREATE INDEX hall_cinema_key
   ON hall (cinema_id);
---rollback drop table hall;

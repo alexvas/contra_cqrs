@@ -7,4 +7,3 @@ CREATE TABLE cinema
   name TEXT   NOT NULL
     CONSTRAINT cinema_name_non_empty CHECK ( name <> '' )
 );
---rollback drop table cinema;
