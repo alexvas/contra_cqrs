@@ -1,10 +1,8 @@
 package contra.rest
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.application.install
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
@@ -18,7 +16,7 @@ import io.ktor.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 import org.apache.logging.log4j.LogManager
 import org.slf4j.event.Level
-import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,8 +26,10 @@ import java.time.format.DateTimeParseException
 
 typealias Handler = suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
 
-private val dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-        .withZone(ZoneId.of("UTC"))
+const val dateFormatPattern = "yyyy-MM-dd'T'HH:mm"
+
+val dtf = DateTimeFormatter.ofPattern(dateFormatPattern)
+        .withZone(ZoneId.of("UTC"))!!
 
 internal fun instant(input: String): Instant =
         LocalDateTime
@@ -66,11 +66,13 @@ fun Application.module() {
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
-            dateFormat = DateFormat.getDateInstance()
+            registerModule(JavaTimeModule())
+            dateFormat = SimpleDateFormat(dateFormatPattern)
             disableDefaultTyping()
         }
     }
     routing {
+        trace { application.log.info(it.buildText()) }
         method(HttpMethod.Get) {
 
             route("cinema") {
@@ -84,7 +86,10 @@ fun Application.module() {
                 route("{startingIncluding}/{endingExcluding}") { handle(findMovieInInterval) }
             }
 
-            route("show/{movieId}/{cinemaId}/{startingIncluding}/{endingExcluding}") { handle(findShowInInterval) }
+            route("show") {
+                route("{id}") { handle(findShow) }
+                route("{movieId}/{cinemaId}/{startingIncluding}/{endingExcluding}") { handle(findShowInInterval) }
+            }
         }
 
         method(HttpMethod.Post) {

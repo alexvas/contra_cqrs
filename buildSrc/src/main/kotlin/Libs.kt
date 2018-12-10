@@ -8,6 +8,11 @@ import kotlin.String
  * to update this file */
 object Libs {
     /**
+     * [jackson-datatype-jsr310 website](https://github.com/FasterXML/jackson-modules-java8) */
+    const val jackson_datatype_jsr310: String =
+            "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:" + Versions.jackson_datatype_jsr310
+
+    /**
      * [disruptor website](http://lmax-exchange.github.com/disruptor) */
     const val disruptor: String = "com.lmax:disruptor:" + Versions.disruptor
 

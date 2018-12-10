@@ -9,6 +9,14 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import java.time.Instant
 
+val findShow: Handler = {
+    call.parameters["id"]
+            ?.toInt()
+            ?.let { id -> findShow(id) }
+            ?.let { show -> call.respond(show) }
+            ?: call.respond(HttpStatusCode.NotFound, "not found")
+}
+
 val findShowInInterval: Handler = {
     val movieId: Int?
     val cinemaId: Int?
@@ -36,7 +44,7 @@ val book: Handler = {
     val show: Show?
     val seats: Set<Int>?
     call.parameters.let { params ->
-        show = params["showId"]?.toInt()?.let { id -> findShow(id) }
+        show = params["id"]?.toInt()?.let { id -> findShow(id) }
         seats = params["seats"]?.splitToSequence(',')
                 ?.map { chunk -> chunk.toInt() }
                 ?.toSet()

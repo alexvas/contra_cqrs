@@ -8,12 +8,12 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.aeonbits.owner.ConfigFactory
 
-internal fun start(conf: Conf, wait: Boolean) {
+internal fun startServer(conf: Conf, wait: Boolean) {
     configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
     embeddedServer(Netty, conf.port(), conf.host(), module = Application::module)
             .start(wait)
 }
 
 fun main(args: Array<String>) {
-    start(ConfigFactory.create(Conf::class.java)!!, true)
+    startServer(ConfigFactory.create(Conf::class.java)!!, true)
 }

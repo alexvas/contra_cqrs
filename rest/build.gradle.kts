@@ -17,6 +17,7 @@ dependencies {
     implementation(Libs.ktor_server_core)
     implementation(Libs.ktor_server_netty)
     implementation(Libs.ktor_jackson)
+    implementation(Libs.jackson_datatype_jsr310)
 
     implementation(Libs.owner_java8)
 

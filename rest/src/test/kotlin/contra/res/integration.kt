@@ -1,16 +1,17 @@
 package contra.res
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import contra.common.Cinema
 import contra.common.Conf
 import contra.common.Movie
-import contra.dal.closePools
-import contra.dal.ethaloneCinemas
-import contra.dal.ethaloneMovies
-import contra.dal.initDbWithTestData
-import contra.rest.start
+import contra.common.Show
+import contra.dal.*
+import contra.rest.dateFormatPattern
+import contra.rest.startServer
 import io.ktor.client.HttpClient
 import io.ktor.client.call.call
 import io.ktor.client.engine.apache.Apache
+import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.request
@@ -26,13 +27,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import java.text.SimpleDateFormat
 import java.util.concurrent.ThreadFactory
 
 var clientThreadNum = 0
 val clientThreadFactory = ThreadFactory { Thread(it, "Ktor-client-${++clientThreadNum}").apply { isDaemon = true } }
 
 internal val httpClient = HttpClient(Apache) {
-    install(JsonFeature)
+    install(JsonFeature) {
+        serializer = JacksonSerializer {
+            registerModule(JavaTimeModule())
+            dateFormat = SimpleDateFormat(dateFormatPattern)
+        }
+    }
 
     expectSuccess = false
     engine {
@@ -55,76 +62,68 @@ internal val httpClient = HttpClient(Apache) {
 
 val conf = ConfigFactory.create(Conf::class.java)!!
 
-internal suspend inline fun <reified T> call(requestConfig: (HttpRequestBuilder) -> Unit): T {
-    val builder = builder()
-    requestConfig.invoke(builder)
-    return httpClient.request(builder)
+private fun builder() = HttpRequestBuilder().apply {
+    url.host = conf.host()
+    url.port = conf.port()
+    method = HttpMethod.Get // default value
 }
-
-private fun builder() =
-        HttpRequestBuilder().apply {
-            url.host = conf.host()
-            url.port = conf.port()
-            method = HttpMethod.Get // default value
-        }
 
 @Suppress("NonAsciiCharacters")
 class IntegrationTests : CoroutineScope {
 
     override val coroutineContext = Job()
 
+    private inline fun <reified T> call(crossinline requestConfig: (HttpRequestBuilder) -> Unit): T = runBlocking(coroutineContext) {
+        val builder = builder()
+        requestConfig.invoke(builder)
+        httpClient.request<T>(builder)
+    }
+
+    private inline fun <reified T> get(vararg components: String) = call<T> {
+        it.url.path(*components)
+    }
+
+    private inline fun <reified T> post(vararg components: String) = call<T> {
+        it.url.path(*components)
+        it.method = HttpMethod.Post
+    }
+
     @BeforeAll
     fun beforeAll() {
-        start(conf, false)
+        startServer(conf, false)
         initDbWithTestData()
     }
 
     @Test
     fun `а что нынче показывают?`() {
-        val response = runBlocking(coroutineContext) {
-            call<List<Movie>> {
-                // curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/all
-                it.url.path("movie", "all")
-            }
-        }
+        // curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/all
+        val response = get<List<Movie>>("movie", "all")
         assertThat(response).isEqualTo(ethaloneMovies)
     }
 
     @Test
     fun `а в каких кинотеатрах?`() {
-        val response = runBlocking(coroutineContext) {
-            call<List<Cinema>> {
-                // curl -H "Content-Type: application/json" 127.0.0.1:8080/cinema/all
-                it.url.path("cinema", "all")
-            }
-        }
+        // curl -H "Content-Type: application/json" 127.0.0.1:8080/cinema/all
+        val response = get<List<Cinema>>("cinema", "all")
         assertThat(response).isEqualTo(ethaloneCinemas)
     }
 
     @Test
     fun `пойдём в "Гигант"!`() {
-        val response = runBlocking(coroutineContext) {
-            call<Cinema> {
-                // curl -H "Content-Type: application/json" 127.0.0.1:8080/cinema/1
-                it.url.path("cinema", "1")
-            }
-        }
+        // curl -H "Content-Type: application/json" 127.0.0.1:8080/cinema/1
+        val response = get<Cinema>("cinema", "1")
         assertThat(response).isEqualTo(ethaloneCinemas[0])
     }
 
     @Test
     fun `на "Акулу-каракулу"!`() {
-        val response = runBlocking(coroutineContext) {
-            call<Movie> {
-                // curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/1
-                it.url.path("movie", "1")
-            }
-        }
+        // curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/1
+        val response = get<Movie>("movie", "1")
         assertThat(response).isEqualTo(ethaloneMovies[0])
     }
 
     @Test
-    fun `такое кино у нас не показывают, мальчик`() {
+    fun `кино #99 у нас не показывают, мальчик`() {
         // curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/99
         val response = runBlocking(coroutineContext) {
             httpClient.call(builder().apply {
@@ -133,6 +132,45 @@ class IntegrationTests : CoroutineScope {
         }
         assertThat(response.status).isEqualTo(HttpStatusCode.NotFound)
         assertThat(runBlocking { response.readText() }).isEqualTo("not found")
+    }
+
+    private fun book(showId: Int, seats: Iterable<Int>): Boolean =
+            post("show", showId.toString(), seats.joinToString(","))
+
+    private fun findShow(showId: Int): Show = get("show", showId.toString())
+
+    @Test
+    fun `ищем ближайший сеанс "Акулы-каракулы" в "Гиганте" и занимаем там места`() {
+        // curl -H "Content-Type: application/json" 127.0.0.1:8080/show/1/1/2018-01-01T00:00/2030-12-31T23:59
+        val response = get<Map<Int, List<Show>>>("show", "1", "1", "2018-01-01T00:00", "2030-12-31T23:59")
+        assertThat(response).isNotEmpty
+        val earliestShow = response.asSequence()
+                .flatMap { it.value.asSequence() }
+                .filter { it.availableSeats.isNotEmpty() }
+                .filter { it.availableSeats.size > 10 }
+                .minBy { it.start }!!
+        val availableBeforeBooking = earliestShow.availableSeats
+        val toBook = availableBeforeBooking.toList().subList(0, 5) // выбрали 5 свободных мест
+
+
+        // curl -X POST -H "Content-Type: application/json" 127.0.0.1:8080/show/<id сеанса>/<места через запятую>
+        val bookingResponse = book(earliestShow.id, toBook)
+        assertThat(bookingResponse).isTrue()
+
+        // curl -H "Content-Type: application/json" 127.0.0.1:8080/show/<id сеанса>
+        val showAfterBooking = findShow(earliestShow.id)
+
+        val availableAfterBooking = showAfterBooking.availableSeats
+        assertThat(availableBeforeBooking.size - availableAfterBooking.size).isEqualTo(5) // число свободных мест уменьшилось на 5
+
+        // схитрим: попробуем взять только что занятое место и ещё одно свободное и снова занять их
+        val toDoubleBook = listOf(toBook[0], availableAfterBooking.first())
+        val doubleBookingResponse = book(earliestShow.id, toDoubleBook)
+        assertThat(doubleBookingResponse).isFalse()
+        val showAfterDoubleBooking = findShow(earliestShow.id)
+        assertThat(showAfterDoubleBooking)
+                .describedAs("после неудачного занятия мест ничего и не поменялось")
+                .isEqualTo(showAfterBooking)
     }
 
 

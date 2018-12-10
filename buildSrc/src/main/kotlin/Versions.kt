@@ -7,6 +7,8 @@ import kotlin.String
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
+    const val jackson_datatype_jsr310: String = "2.9.7" 
+
     const val disruptor: String = "3.4.2" 
 
     const val dbsetup_kotlin: String = "2.1.0" 

@@ -63,7 +63,7 @@ internal val hall = insertInto("hall") {
 }
 
 private val after1h = afterHours(1)
-private val after2h = afterHours(2)
+public val after2h = afterHours(2)
 private val after3h = afterHours(3)
 private val after4h = afterHours(4)
 private val after5h = afterHours(5)
