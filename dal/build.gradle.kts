@@ -28,11 +28,6 @@ dependencies {
     implementation(Libs.mybatis_typehandlers_jsr310)
     implementation(Libs.hikaricp)
 
-    kapt(Libs.dagger_compiler)
-    kaptTest(Libs.dagger_compiler)
-    implementation(Libs.dagger)
-    testImplementation(Libs.dagger)
-
     testImplementation(Libs.dbsetup_kotlin)
     testImplementation(Libs.assertj_core)
     testImplementation(Libs.junit_jupiter_api)
