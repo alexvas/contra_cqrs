@@ -1,0 +1,11 @@
+# это настройки rest сервиса
+# значения по умолчанию приведены и закомментированы
+
+# где поднимать rest сервис:
+#server.host=localhost
+#server.port=8080
+
+# как соединяться с БД
+#db.jdbc.url=jdbc:postgresql://localhost:5432/contra_cqrs
+#db.user=contra_cqrs
+#db.password=

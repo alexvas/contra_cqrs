@@ -25,3 +25,4 @@ gradlew.bat
 .DS_Store
 .attach_pid*
 gradle.properties
+contra.properties
