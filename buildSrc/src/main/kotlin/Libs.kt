@@ -8,15 +8,6 @@ import kotlin.String
  * to update this file */
 object Libs {
     /**
-     * [dagger-compiler website](https://github.com/google/dagger) */
-    const val dagger_compiler: String =
-            "com.google.dagger:dagger-compiler:" + Versions.com_google_dagger
-
-    /**
-     * [dagger website](https://github.com/google/dagger) */
-    const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
-
-    /**
      * [disruptor website](http://lmax-exchange.github.com/disruptor) */
     const val disruptor: String = "com.lmax:disruptor:" + Versions.disruptor
 

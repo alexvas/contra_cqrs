@@ -92,6 +92,9 @@ fun buildSeatsBitString(bookedSeats: Collection<Int>): String {
     return "$buf :: other"
 }
 
+fun initDbWithTestData() = NinjaAdapter()
+            .prepare(deleteAll, cinema, movie, hall, shows)
+
 @Suppress("NonAsciiCharacters", "ClassName")
 class DbReadTest {
     private val log = LogManager.getLogger()
@@ -102,8 +105,7 @@ class DbReadTest {
         configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
 
         // все операции -- только чтение. Инициализировать БД надо один раз
-        NinjaAdapter()
-                .prepare(deleteAll, cinema, movie, hall, shows)
+        initDbWithTestData()
     }
 
     @AfterAll

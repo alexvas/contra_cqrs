@@ -3,6 +3,7 @@ package contra.res
 import contra.common.Conf
 import contra.dal.closePools
 import contra.dal.configurePools
+import contra.dal.initDbWithTestData
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.features.json.JsonFeature
@@ -62,6 +63,7 @@ class CsobIntegrationTests : CoroutineScope {
     @BeforeAll
     fun beforeAll() {
         configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
+        initDbWithTestData()
     }
 
     @AfterAll

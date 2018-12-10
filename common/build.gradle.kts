@@ -1,6 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
     kotlin("jvm")
 }
+
+apply<JarTest>()
 
 dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)

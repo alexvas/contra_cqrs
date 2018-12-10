@@ -26,6 +26,9 @@ dependencies {
     implementation(Libs.log4j_jcl)
     implementation(Libs.disruptor)
 
+    testImplementation(project(":common", JarTest.configurationName))
+    testImplementation(project(":dal", JarTest.configurationName))
+
     testImplementation(Libs.ktor_client_apache)
     testImplementation(Libs.ktor_client_jackson)
     testImplementation(Libs.assertj_core)

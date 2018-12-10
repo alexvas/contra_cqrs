@@ -8,6 +8,8 @@ plugins {
     id("org.liquibase.gradle")
 }
 
+apply<JarTest>()
+
 tasks {
     test {
         useJUnitPlatform()
@@ -33,7 +35,9 @@ dependencies {
     testImplementation(Libs.junit_jupiter_api)
     testImplementation(Libs.mockk)
     testImplementation(Libs.owner_java8)
-    
+
+    testImplementation(project(":common", JarTest.configurationName))
+
     testRuntimeOnly(Libs.junit_jupiter_engine)
     testRuntimeOnly(Libs.log4j_core)
     testRuntimeOnly(Libs.log4j_jcl)

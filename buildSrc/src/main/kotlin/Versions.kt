@@ -7,8 +7,6 @@ import kotlin.String
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val com_google_dagger: String = "2.19" 
-
     const val disruptor: String = "3.4.2" 
 
     const val dbsetup_kotlin: String = "2.1.0" 
@@ -64,7 +62,7 @@ object Versions {
 
         const val currentVersion: String = "5.0"
 
-        const val nightlyVersion: String = "5.2-20181209090804+0000"
+        const val nightlyVersion: String = "5.2-20181210000034+0000"
 
         const val releaseCandidate: String = ""
     }
