@@ -13,10 +13,8 @@ dependencies {
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_core)
 
-    implementation(Libs.ktor_client_apache)
     implementation(Libs.ktor_server_core)
     implementation(Libs.ktor_server_netty)
-    implementation(Libs.ktor_client_jackson)
     implementation(Libs.ktor_jackson)
 
     implementation(Libs.owner_java8)
@@ -27,4 +25,17 @@ dependencies {
     implementation(Libs.log4j_jul)
     implementation(Libs.log4j_jcl)
     implementation(Libs.disruptor)
+
+    testImplementation(Libs.ktor_client_apache)
+    testImplementation(Libs.ktor_client_jackson)
+    testImplementation(Libs.assertj_core)
+    testImplementation(Libs.junit_jupiter_api)
+    testImplementation(Libs.mockk)
+
+    testRuntimeOnly(Libs.junit_jupiter_engine)
+    testRuntimeOnly(Libs.log4j_core)
+    testRuntimeOnly(Libs.log4j_jcl)
+    testRuntimeOnly(Libs.log4j_jul)
+    testRuntimeOnly(Libs.log4j_slf4j_impl)
+    testRuntimeOnly(Libs.disruptor)
 }

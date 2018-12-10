@@ -32,7 +32,8 @@ dependencies {
     testImplementation(Libs.assertj_core)
     testImplementation(Libs.junit_jupiter_api)
     testImplementation(Libs.mockk)
-
+    testImplementation(Libs.owner_java8)
+    
     testRuntimeOnly(Libs.junit_jupiter_engine)
     testRuntimeOnly(Libs.log4j_core)
     testRuntimeOnly(Libs.log4j_jcl)

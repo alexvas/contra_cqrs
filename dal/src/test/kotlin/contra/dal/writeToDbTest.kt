@@ -2,6 +2,8 @@ package contra.dal
 
 import com.ninja_squad.dbsetup.Operations
 import com.ninja_squad.dbsetup_kotlin.insertInto
+import contra.common.Conf
+import org.aeonbits.owner.ConfigFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -25,7 +27,8 @@ class DbWriteTest {
 
     @BeforeAll
     fun setUp() {
-        configurePools("jdbc:postgresql://localhost:5432/contra_cqrs", "contra_cqrs")
+        val conf = ConfigFactory.create(Conf::class.java)!!
+        configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
         ninja = NinjaAdapter()
                 .prepare(deleteAll, cinema, movie, hall)
     }

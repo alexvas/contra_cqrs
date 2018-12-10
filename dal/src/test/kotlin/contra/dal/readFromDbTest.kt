@@ -3,8 +3,10 @@ package contra.dal
 import com.ninja_squad.dbsetup.Operations
 import com.ninja_squad.dbsetup_kotlin.insertInto
 import contra.common.Cinema
+import contra.common.Conf
 import contra.common.Movie
 import contra.common.Show
+import org.aeonbits.owner.ConfigFactory
 import org.apache.logging.log4j.LogManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
@@ -96,7 +98,8 @@ class DbReadTest {
 
     @BeforeAll
     fun setUp() {
-        configurePools("jdbc:postgresql://localhost:5432/contra_cqrs", "contra_cqrs")
+        val conf = ConfigFactory.create(Conf::class.java)!!
+        configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
 
         // все операции -- только чтение. Инициализировать БД надо один раз
         NinjaAdapter()
