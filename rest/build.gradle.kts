@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    application
 }
 
 repositories {
@@ -29,6 +30,7 @@ dependencies {
     testImplementation(project(":common", JarTest.configurationName))
     testImplementation(project(":dal", JarTest.configurationName))
 
+    testImplementation(Libs.dbsetup_kotlin)
     testImplementation(Libs.ktor_client_apache)
     testImplementation(Libs.ktor_client_jackson)
     testImplementation(Libs.assertj_core)
@@ -41,4 +43,8 @@ dependencies {
     testRuntimeOnly(Libs.log4j_jul)
     testRuntimeOnly(Libs.log4j_slf4j_impl)
     testRuntimeOnly(Libs.disruptor)
+}
+
+application {
+    mainClassName = "contra.rest.Main"
 }

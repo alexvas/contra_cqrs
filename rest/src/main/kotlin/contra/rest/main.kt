@@ -1,3 +1,4 @@
+@file:JvmName("Main")
 package contra.rest
 
 import contra.common.Conf
@@ -7,14 +8,12 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.aeonbits.owner.ConfigFactory
 
+internal fun start(conf: Conf, wait: Boolean) {
+    configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
+    embeddedServer(Netty, conf.port(), conf.host(), module = Application::module)
+            .start(wait)
+}
 
-object Main {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val conf = ConfigFactory.create(Conf::class.java)!!
-        configurePools(conf.jdbcUrl(), conf.dbUser(), conf.dbPassword().ifEmpty { null })
-
-        embeddedServer(Netty, conf.port(), conf.host(), module = Application::module)
-                .start(wait = true)
-    }
+fun main(args: Array<String>) {
+    start(ConfigFactory.create(Conf::class.java)!!, true)
 }

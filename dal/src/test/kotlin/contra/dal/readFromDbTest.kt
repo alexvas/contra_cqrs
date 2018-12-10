@@ -24,21 +24,31 @@ internal val deleteAll = Operations.deleteAllFrom(
         "cinema"
 )!!
 
+val ethaloneCinemas = listOf(
+        Cinema(1, "Гигант"),
+        Cinema(2, "Пионер"),
+        Cinema(3, "Аврора")
+)
+
 internal val cinema = insertInto("cinema") {
-    var id = 0
     columns("id", "name")
-    values(++id, "Гигант")
-    values(++id, "Пионер")
-    values(++id, "Аврора")
+    ethaloneCinemas.forEach {
+        values(it.id, it.name)
+    }
 }
 
+val ethaloneMovies = listOf(
+        Movie(1, "Акула-каракула страйкс бэк"),
+        Movie(2, "Палки VIII"),
+        Movie(3, "Сумраки"),
+        Movie(4, "Белоснежко и семь женишков")
+)
+
 internal val movie = insertInto("movie") {
-    var id = 0
     columns("id", "title")
-    values(++id, "Акула-каракула страйкс бэк")
-    values(++id, "Палки VIII")
-    values(++id, "Сумраки")
-    values(++id, "Белоснежко и семь женишков")
+    ethaloneMovies.forEach {
+        values(it.id, it.title)
+    }
 }
 
 internal val hall = insertInto("hall") {
@@ -118,20 +128,12 @@ class DbReadTest {
 
         @Test
         fun `а какие-такие вообще бывают кинотеатры?`() {
-            assertThat(allCinemas()).isEqualTo(
-                    listOf(
-                            Cinema(1, "Гигант"),
-                            Cinema(2, "Пионер"),
-                            Cinema(3, "Аврора")
-                    )
-            )
+            assertThat(allCinemas()).isEqualTo(ethaloneCinemas)
         }
 
         @Test
         fun `найдём-ка второй кинотеатр в городе`() {
-            assertThat(findCinema(2)).isEqualTo(
-                    Cinema(2, "Пионер")
-            )
+            assertThat(findCinema(2)).isEqualTo(ethaloneCinemas[1])
         }
     }
 
@@ -140,21 +142,12 @@ class DbReadTest {
 
         @Test
         fun `а какие-такие вообще бывают фильмы?`() {
-            assertThat(allMovies()).isEqualTo(
-                    listOf(
-                            Movie(1, "Акула-каракула страйкс бэк"),
-                            Movie(2, "Палки VIII"),
-                            Movie(3, "Сумраки"),
-                            Movie(4, "Белоснежко и семь женишков")
-                    )
-            )
+            assertThat(allMovies()).isEqualTo(ethaloneMovies)
         }
 
         @Test
         fun `найдём-ка второй фильм в прокате`() {
-            assertThat(findMovie(2)).isEqualTo(
-                    Movie(2, "Палки VIII")
-            )
+            assertThat(findMovie(2)).isEqualTo(ethaloneMovies[1])
         }
 
         @Test
