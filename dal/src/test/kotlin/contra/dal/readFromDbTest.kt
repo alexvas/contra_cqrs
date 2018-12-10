@@ -166,7 +166,7 @@ class DbReadTest {
 
         @Test
         fun `произвольный сеанс`() {
-            val show = findShow(7)
+            val show = findShow(7)!!
             assertThat(show.availableSeats).isNotEmpty
             assertThat(show.availableSeats.size).isLessThan(100)
         }

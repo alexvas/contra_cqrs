@@ -42,7 +42,7 @@ class DbWriteTest {
 
     @Test
     fun `сеанс в БД такой, каким мы его сконфигурировали`() {
-        val show = findShow(1)
+        val show = findShow(1)!!
         assertThat(show.availableSeats.size).isEqualTo(97)
         assertThat(show.availableSeats.max()).isEqualTo(100)
         assertThat(show.availableSeats.min()).isEqualTo(1)
@@ -52,8 +52,8 @@ class DbWriteTest {
 
     @Test
     fun `бронируем место в начале`() {
-        assertThat(book(findShow(1), setOf(1))).isTrue()
-        val updated = findShow(1)
+        assertThat(book(findShow(1)!!, setOf(1))).isTrue()
+        val updated = findShow(1)!!
         assertThat(updated.availableSeats.size).isEqualTo(96)
         assertThat(updated.availableSeats.max()).isEqualTo(100)
         assertThat(updated.availableSeats.min()).isEqualTo(2)
@@ -62,8 +62,8 @@ class DbWriteTest {
 
     @Test
     fun `бронируем место в конце`() {
-        assertThat(book(findShow(1), setOf(100))).isTrue()
-        val updated = findShow(1)
+        assertThat(book(findShow(1)!!, setOf(100))).isTrue()
+        val updated = findShow(1)!!
         assertThat(updated.availableSeats.size).isEqualTo(96)
         assertThat(updated.availableSeats.max()).isEqualTo(99)
         assertThat(updated.availableSeats.min()).isEqualTo(1)
@@ -72,8 +72,8 @@ class DbWriteTest {
 
     @Test
     fun `бронируем кучу мест`() {
-        assertThat(book(findShow(1), setOf(11, 12, 13, 14, 15, 16, 17, 18, 19, 20))).isTrue()
-        val updated = findShow(1)
+        assertThat(book(findShow(1)!!, setOf(11, 12, 13, 14, 15, 16, 17, 18, 19, 20))).isTrue()
+        val updated = findShow(1)!!
         assertThat(updated.availableSeats.size).isEqualTo(87)
         assertThat(updated.availableSeats.max()).isEqualTo(100)
         assertThat(updated.availableSeats.min()).isEqualTo(1)
@@ -82,8 +82,8 @@ class DbWriteTest {
 
     @Test
     fun `не удалось забронировать уже забронированное`() {
-        assertThat(book(findShow(1), setOf(7, 8, 9))).isFalse()
-        val unmodified = findShow(1)
+        assertThat(book(findShow(1)!!, setOf(7, 8, 9))).isFalse()
+        val unmodified = findShow(1)!!
         assertThat(unmodified.availableSeats.size).isEqualTo(97)
         assertThat(unmodified.availableSeats.max()).isEqualTo(100)
         assertThat(unmodified.availableSeats.min()).isEqualTo(1)
