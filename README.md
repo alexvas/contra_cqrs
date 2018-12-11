@@ -57,4 +57,4 @@ curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/all
 ```bash
 curl -H "Content-Type: application/json" 127.0.0.1:8080/show/1/1/2018-01-01T00:00/2030-12-31T23:59
 ```
-другие примеры запросов к сервису можно увидеть в `contra/res/integration.kt`
+другие примеры запросов к сервису можно увидеть в `rest/src/test/kotlin/contra/res/integration.kt`
