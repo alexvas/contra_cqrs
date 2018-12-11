@@ -29,31 +29,26 @@ cp gradle.properties.example gradle.properties
 ./gradlew targetDb update
 ```
 создаём структуры данных в БД
-
-### тестируем работу сервиса автотестами
-Для этого
+### настроить соединение с БД для автотестов или автономной работы
 ```bash
 cp \
-common/src/test/resources/contra.properties.example \
-common/src/test/resources/contra.properties
+common/src/main/resources/contra.properties.example \
+common/src/main/resources/contra.properties
 ```
-и снова редактируем настройки связи с БД и где запускать сервис. А потом выполняем:
+и снова редактируем настройки связи с БД и где запускать сервис.
+
+### протестировать работу сервиса автотестами
+
 ```bash
 ./gradlew test
 ```
 
-### запускаем сервис в автономном режиме
+### запустить сервис в автономном режиме
 Заполняем БД тестовыми данными:
 ```bash
 ./gradlew :rest:test
 ```
 
-Редактируем настройки для автономной работы:
-```bash
-cp \
-rest/src/main/resources/contra.properties.example \
-rest/src/main/resources/contra.properties
-```
 После этого выполняем:
 ```bash
 ./gradlew run
@@ -61,5 +56,9 @@ rest/src/main/resources/contra.properties
 дальше сервис можно тестировать вручную. Например, так:
 ```bash
 curl -H "Content-Type: application/json" 127.0.0.1:8080/movie/all
+```
+или так:
+```bash
+curl -H "Content-Type: application/json" 127.0.0.1:8080/show/1/1/2018-01-01T00:00/2030-12-31T23:59
 ```
 другие примеры запросов к сервису можно увидеть в `contra/res/integration.kt`
