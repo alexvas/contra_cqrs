@@ -28,6 +28,9 @@ dependencies {
     implementation(Libs.log4j_jcl)
     implementation(Libs.disruptor)
 
+    implementation(project(":dal", JarTest.configurationName))
+    implementation(Libs.dbsetup_kotlin)
+
     testImplementation(project(":common", JarTest.configurationName))
     testImplementation(project(":dal", JarTest.configurationName))
 
