@@ -1,10 +1,9 @@
 package contra.common
 
 import org.aeonbits.owner.Config
-import org.aeonbits.owner.Reloadable
 
 @Config.Sources("classpath:contra.properties")
-interface Conf : Config, Reloadable {
+interface Conf : Config {
 
     @Config.Key("server.host")
     @Config.DefaultValue("localhost")

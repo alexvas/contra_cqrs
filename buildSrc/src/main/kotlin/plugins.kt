@@ -22,6 +22,11 @@ class JarTest : Plugin<Project> {
         val jarTest = tasks.register<Jar>("jarTest") {
             dependsOn(kotlinCompile)
             from(kotlinCompile.outputs)
+            from("src/test/resources") {
+                include("**/*.properties")
+                include("**/*.xml")
+            }
+
             classifier = "test"
         }
 
